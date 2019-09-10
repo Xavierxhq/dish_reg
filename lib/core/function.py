@@ -78,9 +78,6 @@ def train_epoch(train_loader, model, loss_fn, optimizer, logger):
     """
     epoch_train_loss = []
     for anchors, positives, negatives, y in train_loader:
-        # for X, y in train_loader:
-        #     pred = model(X)
-        #     loss = loss_fn(pred, y)
         anchors = model(anchors)
         positives = model(positives)
         negatives = model(negatives)
@@ -105,7 +102,6 @@ def test_epoch(test_loader, model, loss_fn):
     """
     model.eval()
     epoch_test_loss = []
-    # for X, y in test_loader:
     for X, y, paths in test_loader:
         pred = model(X)
         loss = loss_fn(pred, y)  # TODO: add accuracy function
@@ -134,10 +130,17 @@ def train(config, train_loader, test_loader, model, loss_fn, optimizer, schedule
 
 
 def online_data_selection(model, images, thresh):
+    """
+    Select new data that are going to be used for online-learning
+    :param model: the model used for feature extraction
+    :param images: unseen images, where we will select some for online-learning
+    :param thresh: a threshold that enforces the selected unseen samples are over a certain confidence
+    :return: the selected unseen samples in list form
+    """
     model.eval()
 
+    # TODO: to select new data for online-learning, we will label the unseen samples and then select some samples
+    #   that are closer to its corresponding class center then the furthest sample (with same class id) in the base set
     conf = model(images)
     keep_flag = torch.gt(conf, thresh)
     images_keep = images[keep_flag]
-    # TODO: warp new online data with data loader
-    raise NotImplementedError()

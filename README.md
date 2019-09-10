@@ -2,9 +2,11 @@
 #### Follow PEP 8 Style https://www.python.org/dev/peps/pep-0008/
 
 
-### Any change on function prototype should discuss with Lin First.
+### Start reading this project from file "scripts.train_classifier.py"
 
-### All function should only do one thing. Split your function into sub function at the right time. Number of lines should not exceed 100.
+### Any change on function prototype should discuss with Lin/Xie First.
+
+### All function should only do one thing. Split your function into sub function at the right time. Number of lines should not exceed 100 in one function.
 
 ### Each time you implement a function, test it with unittest. After unittest passed, commit it with detailed description. Push to develop branch when enough commits are done.
 
