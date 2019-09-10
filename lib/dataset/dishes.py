@@ -46,6 +46,9 @@ class Dishes(Dataset):
         if "extra" in os.path.basename(anchor_path):
             anchor_path = os.path.join(os.path.dirname(anchor_path),
                                        os.path.basename(anchor_path).replace("extra", ""))
+        if "reweight" in os.path.basename(anchor_path):
+            anchor_path = os.path.join(os.path.dirname(anchor_path),
+                                       os.path.basename(anchor_path).replace("reweight", ""))
         if not self.training:
             anchor = read_sample_by_path(anchor_path)
             if self.transform is not None:

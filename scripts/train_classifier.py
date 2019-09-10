@@ -17,6 +17,7 @@ def main():
     # init config
     config = Configuration(args.cfg)
     logger = create_logger(config)
+    # TODO: task1: finish create_data_loader
     train_loader, train_set = create_data_loader(config, training=True)
     test_loader = create_data_loader(config, training=False)
     model = create_model(config)
@@ -32,6 +33,7 @@ def main():
                   loss_fn, optimizer, scheduler, logger, day=i)
         else:
             new_data = None  # TODO: set up new data by yourself.
+            # TODO: task 2: finish select new data for online-learning
             new_data_selected = online_data_selection(
                 model, new_data, config.TRAIN.CONFIDENCE)
             train_loader, _ = create_data_loader(
