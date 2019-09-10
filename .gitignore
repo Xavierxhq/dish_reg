@@ -1,0 +1,7 @@
+*.pth
+*.tar
+.vscode
+.code
+.idea
+.png
+.jpg

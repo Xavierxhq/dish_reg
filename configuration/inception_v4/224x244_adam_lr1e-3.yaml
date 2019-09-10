@@ -1,0 +1,36 @@
+CUDNN:
+  BENCHMARK: True
+  DETERMINISTIC: False
+  ENABLED: True
+DATA:
+  NAME: Dishes
+  ROOT: "/home/xhq/datasets/objective/O_base15/run1_O/train_set"
+  INPUT_SIZE: -224
+    -224
+  BATCH_SIZE: 64
+  FLIP: true
+  ROTATE_FACTOR: 40
+  SCALE_X_FACTOR: 0.2
+  SCALE_Y_FACTOR: 0.2
+  TRANSLATE_X_FACTOR: 0.2
+  TRANSLATE_Y_FACTOR: 0.2
+  SHEAR_FACTOR: 16
+  FLIP_L_R_FACTOR: 0.5
+  FLIP_U_D_FACTOR: 0.5
+  MULTIPLY_FACTOR: 0.5
+MODEL:
+  NAME: InceptionV4
+  PRETRAINED: "resources/../balabala.pth"
+  NUM_CLASSES: 1001
+  SAVE_PATH: "inceptionv4.pth"
+TRAIN:
+  num_days: 4
+  optim_name: Adam
+  scheduler_name: ReduceLROnPlateau
+  loss_name: TripletLoss
+  lr: 0.001
+  epochs: 200
+  model_save_path: "temp/balabala/"
+  log_save_path: "temp/balabala/"
+  confidence: 0.7
+  MARGIN: 20.0
