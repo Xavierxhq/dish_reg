@@ -7,6 +7,7 @@ from torch.optim import *
 from lib.model.loss import *
 from lib.model.inception_v4 import InceptionV4
 from lib.dataset.dishes import Dishes
+from lib.utils.dataset_utils import *
 
 
 def create_data_loader(config, dataset=None, extra_data=None, training=True):
@@ -16,10 +17,10 @@ def create_data_loader(config, dataset=None, extra_data=None, training=True):
         else:
             raise ValueError('dataset is not None but extra_data is None!')
     else:
-        # TODO: do analysis, get hard positives and hard negatives
-
-        # TODO: pass the correct parameters to generate dataset, mind the mode: training
-        dataset = eval(config.DATA.NAME)(config)  # e.g. eval('Dished')()
+        # do analysis, get hard positives and hard negatives
+        sample_sorted_by_distance_to_center, class_to_nearest_class = analyze_and_get_hard_samples(model=None, analysis_set = None, test_pictures = dataset)
+        # pass the correct parameters to generate dataset, mind the mode: training
+        dataset = eval(config.DATA.NAME)(config, sample_sorted_by_distance_to_center, class_to_nearest_class, training=True)  # e.g. eval('Dished')()
     dataloader = DataLoader(dataset, batch_size=config.DATA.BATCH_SIZE,
                             shuffle=training, pin_memory=True, num_workers=int(config.DATA.BATCH_SIZE / 2))
     return dataloader, dataset

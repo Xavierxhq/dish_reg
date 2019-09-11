@@ -24,13 +24,13 @@ MODEL:
   NUM_CLASSES: 1001
   SAVE_PATH: "inceptionv4.pth"
 TRAIN:
-  num_days: 4
-  optim_name: Adam
-  scheduler_name: ReduceLROnPlateau
-  loss_name: TripletLoss
-  lr: 0.001
-  epochs: 200
-  model_save_path: "temp/balabala/"
-  log_save_path: "temp/balabala/"
-  confidence: 0.7
+  NUM_DAYS: 4
+  OPTIM_NAME: Adam
+  SCHEDULER_NAME: ReduceLROnPlateau
+  LOSS_NAME: TripletLoss
+  LR: 0.001
+  EPOCHS: 200
+  MODEL_SAVE_PATH: "temp/balabala/"
+  LOG_SAVE_PATH: "temp/balabala/"
+  CONFIDENCE: 0.7
   MARGIN: 20.0
