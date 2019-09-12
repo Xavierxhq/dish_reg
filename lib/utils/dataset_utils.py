@@ -7,6 +7,9 @@ import cv2
 from torchvision import transforms as T
 import imgaug as ia
 from imgaug import augmenters as iaa
+from lib.utils.common_util import pickle_read, pickle_write, dist
+import time
+import shutil
 
 
 def get_classid_by_filename(filename):
@@ -168,7 +171,6 @@ def get_hard_triplet(anchor_path, dataset, sample_sorted_by_distance_to_center: 
     generate a hard triplet.
     :param anchor_path: the path of the anchor.
     :param dataset: the whole dataset, elements are full paths of the samples.
-    :param dataset: the whole dataset, elements are full paths of the samples.
     :param sample_sorted_by_distance_to_center: stores file names of samples that are sorted 
         by the distances to the corresponding center in ascending order.
     :param class_to_nearest_class: stores key-value pairs, key and value are both class ids, 
@@ -216,4 +218,98 @@ class Transform(object):
         return x
 
 
-# TODO: analyze and get information for hard triplet samples
+# analyze and get information for hard triplet samples
+def analyze_and_get_hard_samples(model, analysis_set, test_pictures = None):
+    if test_pictures == None:
+        test_pictures = os.listdir(analysis_set)
+
+    # _get_avg_feature_for_all(model, test_pictures = test_pictures)
+
+    all_test_pkls_dir = 'tmp/training/%s_all_test_pkls' % 'tableware'.split('/')[0]
+    feature_map = _calc_true_avg_feature(all_test_pkls_dir)
+    sample_sorted_by_distance_to_center = _calc_inter_distance(all_test_pkls_dir)
+    _, class_to_nearest_class = _calc_exter_class_distance(feature_map)
+
+    for classid, d in sample_sorted_by_distance_to_center.items():
+        _d = sorted(d.items(), key=lambda x: x[1])
+        sample_sorted_by_distance_to_center[classid] = _d[-40:]
+    return sample_sorted_by_distance_to_center, class_to_nearest_class
+
+
+def _calc_true_avg_feature(feature_pkls_dir):
+    t1 = time.time
+    feature_pkls = [x for x in os.listdir(
+        feature_pkls_dir) if 'features.pkl' in x]
+    feature_map = {}
+    for pkl in feature_pkls:
+        features = pickle_read(os.path.join(feature_pkls_dir, pkl))
+        features = list(features.values())
+        # _avg_feature = np.zeros(shape=features[0].shape)
+        _avg_feature = None
+        for _feature in features:
+            _feature = _feature.cpu().detach().numpy()
+            # print("shape 0", _feature.shape)
+            if _avg_feature is None:
+                _avg_feature = _feature
+                # print("shape 0 avg", _avg_feature.shape)
+                continue
+            # print("shape", _avg_feature.shape, _feature.shape)
+            _avg_feature += _feature
+        _avg_feature /= len(features)
+        classid = pkl.split('_')[0]
+        feature_map[classid] = torch.Tensor(_avg_feature)
+
+    pickle_write('tmp/training/%s_true_avg_feature_for_each_class.pkl' %
+                 'tableware'.split('/')[0], feature_map)
+    print('Time for _calc_true_avg_feature: %.1f s' % (time.time() - t1))
+    return feature_map
+
+def _calc_exter_class_distance(feature_map):
+    t1 = time.time()
+    id_feature_ls = [(_id, _feature)
+                     for _id, _feature in feature_map.items()]
+    exter_class_distance_dict, class_to_nearest_class = {}, {}
+    for _i in range(len(id_feature_ls)):
+        classid, feature = id_feature_ls[_i]
+        nearest_id, neareast_d = None, 1e6
+        for _second_classid, _second_feature in id_feature_ls[_i+1:]:
+            _d = dist(feature, _second_feature)
+            _key = classid + '-' + _second_classid
+            exter_class_distance_dict[_key] = _d
+            if neareast_d > _d:
+                neareast_d = _d
+                nearest_id = _second_classid
+        class_to_nearest_class[classid] = nearest_id
+
+    pickle_write('tmp/training/%s_exter_class_distances.pkl' %
+                 'tableware'.split('/')[0], exter_class_distance_dict)
+    print('Time for _calc_exter_class_distance: %.1f s' %
+          (time.time() - t1))
+    return exter_class_distance_dict, class_to_nearest_class
+
+def _calc_inter_distance(feature_map_dir, feature_map=None):
+    t1 = time.time()
+    distance_dict = {}
+
+    if feature_map is None:
+        feature_map = pickle_read(
+            'tmp/training/%s_true_avg_feature_for_each_class.pkl' % 'tableware'.split('/')[0])
+    for pkl in [x for x in os.listdir(feature_map_dir) if 'features.pkl' in x]:
+        classid = pkl.split('_')[0]
+        distance_dict[classid] = {}
+        for _filename, _feature in pickle_read(os.path.join(feature_map_dir, pkl)).items():
+            distance_dict[classid][_filename] = dist(
+                feature_map[classid], _feature)
+    pickle_write('tmp/training/%s_inter_class_distances.pkl' %
+                 'tableware'.split('/')[0], distance_dict)
+    print('Time for _calc_inter_distance: %.1f s' % (time.time() - t1))
+    return distance_dict
+
+
+def get_hard_pictures(all_pictures, limit=100):
+    hard_pictures = []
+    for i in range(78):
+        pre = "_%d." % i
+        _ls = [x for x in all_pictures if pre in os.path.basename(x)]
+        hard_pictures.extend(_ls[:limit])
+    return hard_pictures

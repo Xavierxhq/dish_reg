@@ -10,7 +10,7 @@ class Dishes(Dataset):
     # def __init__(self):
     #     raise NotImplementedError()
 
-    def __init__(self, config, transform=None, sample_sorted_by_distance_to_center: dict, class_to_nearest_class: dict, training=True):
+    def __init__(self, config, transform=None, sample_sorted_by_distance_to_center: dict = {}, class_to_nearest_class: dict = {}, training=True):
         """
         Initial function of DishesDataset
         :param config: the class that contains configuration info
@@ -76,7 +76,7 @@ class Dishes(Dataset):
 
     def add_extra_data(self, extra_data: list):
         """
-        Add extra data to trainin set, the added data will not be used as anchor
+        Add extra data to training set, the added data will not be used as anchor
         :param extra_data: extra data to be added
         :return:
         """
