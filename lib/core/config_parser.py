@@ -38,18 +38,18 @@ class DataConfig(object):
 
 class TrainConfig(object):
     def __init__(self, data_dict):
-        self.N_DAYS = data_dict['num_days']
-        self.OPTIM_NAME = data_dict['optim_name']
-        self.SCHEDULER_NAME = data_dict['scheduler_name']
-        self.LOSS_NAME = data_dict['loss_name']
-        self.LR = data_dict['lr']
-        self.EPOCHS = data_dict['epochs']
+        self.N_DAYS = data_dict['NUM_DAYS']
+        self.OPTIM_NAME = data_dict['OPTIM_NAME']
+        self.SCHEDULER_NAME = data_dict['SCHEDULER_NAME']
+        self.LOSS_NAME = data_dict['LOSS_NAME']
+        self.LR = data_dict['LR']
+        self.EPOCHS = data_dict['EPOCHS']
         self.MARGIN = data_dict['MARGIN']
 
-        self.MODEL_SAVE_PATH = data_dict['model_save_path']
-        self.LOG_SAVE_PATH = data_dict['log_save_path']
+        self.MODEL_SAVE_PATH = data_dict['MODEL_SAVE_PATH']
+        self.LOG_SAVE_PATH = data_dict['LOG_SAVE_PATH']
 
-        self.CONFIDENCE = data_dict['confidence']
+        self.CONFIDENCE = data_dict['CONFIDENCE']
 
 
 class ModelConfig(object):
@@ -62,7 +62,7 @@ class ModelConfig(object):
 
 class LoggerConfig(object):
     def __init__(self, data_dict):
-        self.DIR = data_dict['dir']
+        self.DIR = data_dict['DIR']
 
 
 if __name__ == "__main__":
